@@ -9,30 +9,65 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nf = NumberFormat.currency(symbol: '\$');
     final isIncome = tx.type == 'income';
+    final amount =
+        (isIncome ? '+' : '-') +
+        NumberFormat.currency(symbol: '\$').format(tx.amount);
+
     return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          child: Icon(isIncome ? Icons.south_west : Icons.north_east),
-        ),
-        title: Text(tx.title),
-        subtitle: Text(
-          '${tx.category ?? '—'} • ${DateFormat.yMMMd().format(tx.occurredAt)}',
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
+      child: InkWell(
+        onLongPress: onDelete,
+        child: Row(
           children: [
-            Text(
-              (isIncome ? '+' : '-') + nf.format(tx.amount),
-              style: TextStyle(
+            // Colored stripe
+            Container(
+              width: 6,
+              height: 70,
+              decoration: BoxDecoration(
                 color: isIncome ? Colors.green : Colors.red,
-                fontWeight: FontWeight.bold,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  bottomLeft: Radius.circular(16),
+                ),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline),
-              onPressed: onDelete,
+            Expanded(
+              child: ListTile(
+                leading: CircleAvatar(
+                  child: Icon(
+                    isIncome
+                        ? Icons.trending_down_rounded
+                        : Icons.trending_up_rounded,
+                  ),
+                ),
+                title: Text(
+                  tx.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  '${tx.category ?? '—'} • ${DateFormat.yMMMd().format(tx.occurredAt)}',
+                ),
+                trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      amount,
+                      style: TextStyle(
+                        color: isIncome ? Colors.green : Colors.red,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    IconButton(
+                      tooltip: 'Delete',
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: onDelete,
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
